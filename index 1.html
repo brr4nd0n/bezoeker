@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jouw programma — Yource</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e3;
+      --text:   #1f1534;
+      --blue:   #d1e5fc;
+      --purple: #ebcfff;
+      --plenair:#47004a;
+      --r: 18px;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 56px 20px 80px;
+    }
+
+    /* ── Logo ── */
+    .logo-img {
+      width: 160px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    /* ══════════════════════════════════════
+       WACHTWOORDSCHERM
+    ══════════════════════════════════════ */
+    #passwordScreen {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #passwordScreen h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    #passwordScreen .sub {
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.45;
+      margin-bottom: 36px;
+    }
+
+    .pw-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      opacity: 0.45;
+      margin-bottom: 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    #pwInput {
+      width: 100%;
+      padding: 17px 22px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      border: 2px solid transparent;
+      border-radius: var(--r);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 16px rgba(31,21,52,.07);
+    }
+
+    #pwInput::placeholder { letter-spacing: 1px; font-weight: 400; opacity: 0.35; font-size: 15px; }
+    #pwInput:focus { border-color: var(--text); }
+
+    #pwInput.shake {
+      animation: shake 0.4s ease;
+      border-color: #c0392b;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-6px); }
+      80%      { transform: translateX(6px); }
+    }
+
+    .pw-error {
+      font-size: 13px;
+      font-weight: 600;
+      color: #c0392b;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+
+    /* ══════════════════════════════════════
+       HOOFD-APP
+    ══════════════════════════════════════ */
+    #appScreen {
+      width: 100%;
+      max-width: 500px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #appScreen.visible {
+      display: flex;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    .sub {
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.45;
+    }
+
+    /* ── Zoekbalk ── */
+    .search-wrap { width: 100%; }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      opacity: 0.45;
+      margin-bottom: 10px;
+    }
+
+    .input-rel { position: relative; }
+
+    #nameInput {
+      width: 100%;
+      padding: 17px 22px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border: 2px solid transparent;
+      border-radius: var(--r);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 16px rgba(31,21,52,.07);
+    }
+
+    #nameInput::placeholder { font-weight: 400; opacity: 0.4; }
+    #nameInput:focus { border-color: var(--text); }
+
+    #dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0; right: 0;
+      background: #fff;
+      border-radius: var(--r);
+      box-shadow: 0 12px 40px rgba(31,21,52,.14);
+      overflow-y: auto;
+      max-height: 300px;
+      display: none;
+      z-index: 200;
+    }
+
+    #dropdown.open { display: block; }
+
+    .dd-item {
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s;
+      border-bottom: 1px solid rgba(31,21,52,.05);
+    }
+
+    .dd-item:last-child { border-bottom: none; }
+    .dd-item:hover, .dd-item:active { background: var(--bg); }
+
+    .dd-item span {
+      font-weight: 400;
+      opacity: 0.45;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+
+    /* ── Knop ── */
+    .action-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 18px 22px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .action-btn:active { opacity: 0.85; transform: scale(0.98); }
+    .action-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+    /* ── Route ── */
+    .route-section {
+      width: 100%;
+      margin-top: 44px;
+      display: none;
+    }
+
+    .route-section.visible {
+      display: block;
+      animation: fadeUp 0.35s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .greeting {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin-bottom: 4px;
+    }
+
+    .greeting-sub {
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.45;
+      margin-bottom: 28px;
+    }
+
+    /* ── Kaarten ── */
+    .card {
+      border-radius: var(--r);
+      padding: 24px 26px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .card-plenair    { background: var(--plenair); color: #f5f0e3; }
+    .card-propositie { background: var(--blue);    color: var(--text); }
+    .card-kernwaarde { background: var(--purple);  color: var(--text); }
+
+    .card-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-top: 2px;
+      min-width: 34px;
+    }
+
+    .round-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .card-plenair .round-dot    { background: rgba(245,240,227,.15); color: #f5f0e3; }
+    .card-propositie .round-dot { background: rgba(31,21,52,.1);     color: var(--text); }
+    .card-kernwaarde .round-dot { background: rgba(31,21,52,.1);     color: var(--text); }
+
+    .round-line {
+      width: 2px;
+      flex: 1;
+      min-height: 16px;
+      border-radius: 2px;
+    }
+
+    .card-plenair .round-line    { background: rgba(245,240,227,.2); }
+    .card-propositie .round-line { background: rgba(31,21,52,.12); }
+    .card-kernwaarde .round-line { background: rgba(31,21,52,.12); }
+
+    .card-body { flex: 1; }
+
+    .card-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      opacity: 0.45;
+      margin-bottom: 5px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .card-ruimte {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.65;
+      margin-bottom: 4px;
+    }
+
+    .card-loper {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.55;
+    }
+
+    .card-uitleg {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.6;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+
+    /* ── Pauze ── */
+    .card-pauze {
+      background: var(--text);
+      color: #f5f0e3;
+      border-radius: var(--r);
+      padding: 16px 26px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .card-pauze .pauze-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(245,240,227,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .card-pauze .card-eyebrow { opacity: 0.4; margin-bottom: 2px; }
+    .card-pauze .card-title   { font-size: 15px; margin-bottom: 0; }
+
+    footer {
+      margin-top: 56px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.25;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ WACHTWOORDSCHERM ══ -->
+  <div id="passwordScreen">
+    <img class="logo-img" src="1Logo_yource_2026_PNG_S.png" alt="Yource" />
+    <h1>Bekijk hier jouw workshop route</h1>
+    <p class="sub">Voer de toegangscode in om je programma te bekijken.</p>
+
+    <label class="pw-label" for="pwInput">Toegangscode</label>
+    <input type="password" id="pwInput" placeholder="••••••••" autocomplete="off" inputmode="text" />
+    <div class="pw-error" id="pwError"></div>
+    <button class="action-btn" id="pwBtn" style="margin-top:20px;">Verder</button>
+  </div>
+
+  <!-- ══ HOOFD-APP ══ -->
+  <div id="appScreen">
+    <header>
+      <img class="logo-img" src="1Logo_yource_2026_PNG_S.png" alt="Yource" />
+      <h1>Bekijk hier jouw workshop route</h1>
+      <p class="sub">Zoek je naam en zie jouw programma voor vandaag.</p>
+    </header>
+
+    <div class="search-wrap">
+      <label class="field-label" for="nameInput">Jouw naam</label>
+      <div class="input-rel">
+        <input type="text" id="nameInput" placeholder="Typ je naam..." autocomplete="off" spellcheck="false" inputmode="text" />
+        <div id="dropdown"></div>
+      </div>
+      <button class="action-btn" id="confirmBtn" disabled>Bekijk mijn programma</button>
+    </div>
+
+    <div class="route-section" id="routeSection">
+      <div class="greeting" id="greeting"></div>
+      <p class="greeting-sub">Dit is jouw programma voor vandaag.</p>
+      <div id="cards"></div>
+    </div>
+  </div>
+
+  <footer>Ontdek het vernieuwde Yource</footer>
+
+  <script>
+  // ╔══════════════════════════════════════════════════════╗
+  // ║  CONFIG                                              ║
+  // ╚══════════════════════════════════════════════════════╝
+
+  var WACHTWOORD = 'yource2026'; // ← pas dit aan
+
+  var ROUND_LABELS = [
+    { label: 'Ronde 1', tijd: '14:00 – 14:45' },
+    { label: 'Ronde 2', tijd: '14:45 – 15:30' },
+    { label: 'Ronde 3', tijd: '16:00 – 16:45' },
+  ];
+
+  var WORKSHOP_META = {
+    'De stem van Yource':       { type: 'plenair',    ruimte: '', loper: 'Volg de paarse loper' },
+    'Arbeidsmarkt propositie':  { type: 'propositie', ruimte: '', loper: 'Volg de blauwe loper' },
+    'B2B Proposities 1':        { type: 'propositie', ruimte: '', loper: 'Volg de blauwe loper' },
+    'B2B Proposities 2':        { type: 'propositie', ruimte: '', loper: 'Volg de blauwe loper' },
+    'Samen':     { type: 'kernwaarde', ruimte: '', loper: 'Volg de roze loper',
+                   uitleg: 'We zijn op ons best als we het samen doen. Daarom zoeken we elkaar actief op, geven we elkaar vertrouwen en zeggen we eerlijk wat goed gaat en wat beter kan. Zo blijven we leren, houden we de energie in het team hoog en versterken we onze samenwerking.' },
+    'Eenvoud':   { type: 'kernwaarde', ruimte: '', loper: 'Volg de roze loper',
+                   uitleg: 'Als iets eenvoudig is, geeft dat rust en overzicht. Zo kunnen we ons werk goed doen. Daarom zijn we duidelijk naar elkaar en naar onze klanten, communiceren we helder en zoeken we steeds naar manieren om slimmer te werken.' },
+    'Ambitieus': { type: 'kernwaarde', ruimte: '', loper: 'Volg de roze loper',
+                   uitleg: 'We willen elke dag iets verbeteren. Daarom blijven we onszelf uitdagen, denken we vooruit, benutten we kansen en zijn we eerlijk over wat haalbaar is. Zo overtreffen we verwachtingen en leren we van vandaag, om het morgen nog beter te doen.' },
+  };
+
+  // Deelnemers — vervang dit met de echte lijst
+  // Kolommen: voornaam, achternaam, ronde1, ronde2, ronde3
+  var MENSEN = [
+    // ── Rotatie A: Stem R1 ──────────────────────────────
+    ['Emma',      'de Vries',   'De stem van Yource', 'Arbeidsmarkt propositie', 'Samen'],
+    ['Liam',      'Janssen',    'De stem van Yource', 'Arbeidsmarkt propositie', 'Eenvoud'],
+    ['Sophie',    'Bakker',     'De stem van Yource', 'Arbeidsmarkt propositie', 'Ambitieus'],
+    ['Noah',      'van den Berg','De stem van Yource', 'B2B Proposities 1',      'Samen'],
+    ['Olivia',    'Visser',     'De stem van Yource', 'B2B Proposities 1',       'Eenvoud'],
+    ['Lucas',     'Smit',       'De stem van Yource', 'B2B Proposities 1',       'Ambitieus'],
+    ['Mila',      'Meijer',     'De stem van Yource', 'B2B Proposities 2',       'Samen'],
+    ['Finn',      'de Boer',    'De stem van Yource', 'B2B Proposities 2',       'Eenvoud'],
+    ['Sara',      'Mulder',     'De stem van Yource', 'B2B Proposities 2',       'Ambitieus'],
+    // ── Rotatie B: Stem R2 ──────────────────────────────
+    ['Thomas',    'Bos',        'Arbeidsmarkt propositie', 'De stem van Yource', 'Samen'],
+    ['Julie',     'Postma',     'Arbeidsmarkt propositie', 'De stem van Yource', 'Eenvoud'],
+    ['Lars',      'Hendriks',   'Arbeidsmarkt propositie', 'De stem van Yource', 'Ambitieus'],
+    ['Nora',      'van Dijk',   'B2B Proposities 1',       'De stem van Yource', 'Samen'],
+    ['Daan',      'Peters',     'B2B Proposities 1',       'De stem van Yource', 'Eenvoud'],
+    ['Roos',      'Vermeer',    'B2B Proposities 1',       'De stem van Yource', 'Ambitieus'],
+    ['Bram',      'Huisman',    'B2B Proposities 2',       'De stem van Yource', 'Samen'],
+    ['Fleur',     'Koops',      'B2B Proposities 2',       'De stem van Yource', 'Eenvoud'],
+    ['Jesse',     'Wolff',      'B2B Proposities 2',       'De stem van Yource', 'Ambitieus'],
+    // ── Rotatie C: Stem R3 ──────────────────────────────
+    ['Anna',      'Linden',     'Arbeidsmarkt propositie', 'Samen',    'De stem van Yource'],
+    ['Tim',       'Groot',      'Arbeidsmarkt propositie', 'Eenvoud',  'De stem van Yource'],
+    ['Eva',       'Prins',      'Arbeidsmarkt propositie', 'Ambitieus','De stem van Yource'],
+    ['Sven',      'Kuijper',    'B2B Proposities 1',       'Samen',    'De stem van Yource'],
+    ['Lisa',      'Brouwer',    'B2B Proposities 1',       'Eenvoud',  'De stem van Yource'],
+    ['Max',       'Timmerman',  'B2B Proposities 1',       'Ambitieus','De stem van Yource'],
+    ['Iris',      'van Leeuwen','B2B Proposities 2',       'Samen',    'De stem van Yource'],
+    ['Joep',      'Hoekstra',   'B2B Proposities 2',       'Eenvoud',  'De stem van Yource'],
+    ['Kim',       'Willems',    'B2B Proposities 2',       'Ambitieus','De stem van Yource'],
+  ];
+
+  // ╔══════════════════════════════════════════════════════╗
+  // ║  EINDE CONFIG                                        ║
+  // ╚══════════════════════════════════════════════════════╝
+
+  var people = MENSEN.map(function(r) {
+    return {
+      voornaam:   r[0],
+      achternaam: r[1],
+      full:       r[0] + ' ' + r[1],
+      routes:     [r[2], r[3], r[4]],
+    };
+  });
+
+  // ── Wachtwoord ───────────────────────────────────────
+  var pwInput = document.getElementById('pwInput');
+  var pwBtn   = document.getElementById('pwBtn');
+  var pwError = document.getElementById('pwError');
+
+  function checkPassword() {
+    if (pwInput.value === WACHTWOORD) {
+      document.getElementById('passwordScreen').style.display = 'none';
+      var app = document.getElementById('appScreen');
+      app.classList.add('visible');
+      document.getElementById('nameInput').focus();
+    } else {
+      pwError.textContent = 'Onjuiste code. Probeer het opnieuw.';
+      pwInput.classList.remove('shake');
+      void pwInput.offsetWidth;
+      pwInput.classList.add('shake');
+      pwInput.value = '';
+      setTimeout(function() { pwInput.classList.remove('shake'); }, 500);
+    }
+  }
+
+  pwBtn.addEventListener('click', checkPassword);
+  pwInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  // ── Zoek & dropdown ──────────────────────────────────
+  var input         = document.getElementById('nameInput');
+  var dropdown      = document.getElementById('dropdown');
+  var confirmBtn    = document.getElementById('confirmBtn');
+  var selectedPerson = null;
+
+  input.addEventListener('input', function() {
+    selectedPerson = null;
+    confirmBtn.disabled = true;
+
+    var q = input.value.toLowerCase().trim();
+    if (!q) { closeDropdown(); return; }
+
+    var hits = people.filter(function(p) {
+      return p.full.toLowerCase().indexOf(q) !== -1 ||
+             p.voornaam.toLowerCase().indexOf(q) === 0 ||
+             p.achternaam.toLowerCase().indexOf(q) === 0;
+    }).slice(0, 10);
+
+    if (!hits.length) { closeDropdown(); return; }
+
+    dropdown.innerHTML = hits.map(function(p) {
+      return '<div class="dd-item" data-full="' + escHtml(p.full) + '">' +
+             escHtml(p.voornaam) + ' <span>' + escHtml(p.achternaam) + '</span></div>';
+    }).join('');
+    dropdown.classList.add('open');
+  });
+
+  dropdown.addEventListener('click', function(e) {
+    var item = e.target.closest('.dd-item');
+    if (!item) return;
+    var fullName = item.getAttribute('data-full');
+    for (var i = 0; i < people.length; i++) {
+      if (people[i].full === fullName) { selectedPerson = people[i]; break; }
+    }
+    if (selectedPerson) {
+      input.value = selectedPerson.full;
+      closeDropdown();
+      confirmBtn.disabled = false;
+      confirmBtn.focus();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.input-rel')) closeDropdown();
+  });
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && selectedPerson) showRoute(selectedPerson);
+  });
+
+  confirmBtn.addEventListener('click', function() {
+    if (selectedPerson) showRoute(selectedPerson);
+  });
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    dropdown.innerHTML = '';
+  }
+
+  // ── Route tonen ──────────────────────────────────────
+  function showRoute(p) {
+    document.getElementById('greeting').textContent = 'Hoi ' + p.voornaam + '!';
+
+    var html = '';
+    for (var i = 0; i < p.routes.length; i++) {
+
+      // Pauze vóór ronde 3
+      if (i === 2) {
+        html += '<div class="card-pauze">' +
+          '<div class="pauze-dot">☕</div>' +
+          '<div>' +
+            '<div class="card-eyebrow">15:30 – 16:00</div>' +
+            '<div class="card-title">Pauze</div>' +
+          '</div>' +
+        '</div>';
+      }
+
+      var workshop = p.routes[i];
+      var meta     = WORKSHOP_META[workshop] || {};
+      var type     = meta.type   || 'propositie';
+      var ruimte   = meta.ruimte || '';
+      var loper    = meta.loper  || '';
+      var uitleg   = meta.uitleg || '';
+      var ronde    = ROUND_LABELS[i];
+
+      html += '<div class="card card-' + type + '">' +
+        '<div class="card-left">' +
+          '<div class="round-dot">' + (i + 1) + '</div>' +
+          (i < 2 ? '<div class="round-line"></div>' : '') +
+        '</div>' +
+        '<div class="card-body">' +
+          '<div class="card-eyebrow">' + ronde.label + ' &nbsp;·&nbsp; ' + ronde.tijd + '</div>' +
+          '<div class="card-title">' + escHtml(workshop || '—') + '</div>' +
+          (uitleg ? '<div class="card-uitleg">' + escHtml(uitleg) + '</div>' : '') +
+          (ruimte ? '<div class="card-ruimte">Workshop ruimte: ' + escHtml(ruimte) + '</div>' : '') +
+          (loper  ? '<div class="card-loper">' + escHtml(loper) + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById('cards').innerHTML = html;
+
+    var section = document.getElementById('routeSection');
+    section.classList.remove('visible');
+    void section.offsetWidth;
+    section.classList.add('visible');
+    setTimeout(function() {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  </script>
+</body>
+</html>
